@@ -1,0 +1,11 @@
+Name,Description,List,Owner
+Approve SRS and design,"Review scope; verify lecturer accepts Next.js; fill team names and deadline.",To do,Both
+Set up application and MongoDB,"Pin stack versions; configure environment; connect replica set; prepare deployment skeleton.",To do,Person A
+Build authentication and roles,"Register/login/logout with Better Auth; seed staff; enforce roles and ownership; check direct API access.",To do,Person A
+Build navigation and auth pages,"Responsive page shell; labelled forms; session states and working logout.",To do,Person B
+Build request API,"Create/read/update/delete own open reports; validate input; cover locked edits and concurrent updates.",To do,Person A
+Build request screens,"List/detail/create/edit/delete confirmation; errors; empty states; mobile cards.",To do,Person B
+Build staff workflow and categories,"Status transitions; resolution note; category CRUD; safe reference rules.",To do,Person A
+Build sorting and dashboard,"Search/filter/sort/page controls; role-scoped counts and recent reports; staff category screen.",To do,Person B
+Run acceptance checks,"Execute AT-01–09 together; fix integration and mobile defects.",To do,Both
+Deploy and prepare submission,"Run performance check; verify HTTPS and persistence; update SRS/API/design; record demo steps and deployed URL.",To do,Both
