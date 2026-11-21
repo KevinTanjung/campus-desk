@@ -1,0 +1,33 @@
+{
+  "name": "campus-desk",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:integration": "node --env-file=.env.local --import tsx tests/integration.ts",
+    "db:init": "node --env-file=.env.local --import tsx scripts/init-db.ts",
+    "seed:staff": "node --env-file=.env.local --import tsx scripts/seed-staff.ts"
+  },
+  "dependencies": {
+    "@better-auth/mongo-adapter": "1.7.28",
+    "better-auth": "1.7.28",
+    "mongodb": "7.9.1",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/node": "26.6.11",
+    "@types/react": "19.3.3",
+    "@types/react-dom": "19.3.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  },
+  "type": "module"
+}
