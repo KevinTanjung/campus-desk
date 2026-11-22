@@ -2,7 +2,12 @@ node_modules/
 .next/
 .env*
 !.env.example
+!.env.test.example
 coverage/
 test-results/
 playwright-report/
 *.tsbuildinfo
+
+.DS_Store
+AGENTS.md
+docs/~$*
