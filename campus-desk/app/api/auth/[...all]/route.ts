@@ -24,7 +24,7 @@ async function handle(request: Request) {
       throw new HttpError(404, "NOT_FOUND", "Endpoint not found.");
     if (request.method === "POST") {
       checkOrigin(request);
-      const body = await readJson(request.clone());
+      const body = await readJson(request);
       if (
         path === "sign-out" &&
         (!body ||
@@ -41,6 +41,13 @@ async function handle(request: Request) {
           },
           400,
         );
+      const headers = new Headers(request.headers);
+      headers.delete("content-length");
+      request = new Request(request.url, {
+        method: request.method,
+        headers,
+        body: JSON.stringify(body),
+      });
     }
     const response = await (await getAuth()).handler(request);
     response.headers.set("Cache-Control", "private, no-store");

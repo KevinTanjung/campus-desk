@@ -11,6 +11,10 @@ function createAuth() {
     );
   const baseURL = process.env.BETTER_AUTH_URL;
   if (!baseURL) throw new Error("BETTER_AUTH_URL is required.");
+  const ipHeader =
+    process.env.VERCEL === "1" ? "x-forwarded-for" : process.env.AUTH_IP_HEADER;
+  if (process.env.NODE_ENV === "production" && !ipHeader)
+    throw new Error("AUTH_IP_HEADER is required outside Vercel in production.");
   return betterAuth({
     appName: "Campus Desk",
     baseURL,
@@ -39,9 +43,7 @@ function createAuth() {
     trustedOrigins: [new URL(baseURL).origin],
     advanced: {
       ipAddress: {
-        ipAddressHeaders: process.env.AUTH_IP_HEADER
-          ? [process.env.AUTH_IP_HEADER]
-          : [],
+        ipAddressHeaders: ipHeader ? [ipHeader] : [],
       },
       defaultCookieAttributes: {
         httpOnly: true,

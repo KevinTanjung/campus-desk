@@ -13,8 +13,18 @@ assert.match(
   /^mongodb:\/\/127\.0\.0\.1:/,
   "Integration tests require a local database.",
 );
+assert.match(
+  process.env.MONGODB_DB || "",
+  /^campus_desk_test(?:_|$)/,
+  "Use a separate campus_desk_test database.",
+);
+assert.equal(
+  new URL(base).port,
+  "3001",
+  "Use the isolated test server on port 3001.",
+);
 const mongo = new MongoClient(process.env.MONGODB_URI!),
-  db = mongo.db(process.env.MONGODB_DB || "campus_desk");
+  db = mongo.db(process.env.MONGODB_DB);
 const tag = Date.now().toString(),
   createdIds: string[] = [],
   categoryIds: string[] = [],
@@ -37,6 +47,7 @@ async function call(
     headers: {
       origin: base,
       cookie,
+      "x-campus-test-ip": "127.0.0.10",
       ...(body === undefined ? {} : { "content-type": "application/json" }),
       ...extra,
     },
@@ -455,6 +466,27 @@ try {
     ).response.status,
     429,
   );
+  equal(
+    (
+      await call(
+        "/api/auth/sign-in/email",
+        "",
+        "POST",
+        { email: other.email, password },
+        { "x-campus-test-ip": "127.0.0.11" },
+      )
+    ).response.status,
+    200,
+  );
+  equal(
+    (
+      await call("/api/auth/sign-in/email", "", "POST", {
+        email: other.email,
+        password: "x".repeat(17000),
+      })
+    ).response.status,
+    413,
+  );
   console.log(
     `PASS: ${assertions} API assertions including ownership, transitions, concurrency, validation, logout, expiry and rate limiting.`,
   );
@@ -469,11 +501,9 @@ try {
     .collection("user")
     .deleteMany({ _id: { $in: userIds.map((id) => new ObjectId(id)) } });
   for (const name of ["account", "session"])
-    await db
-      .collection(name)
-      .deleteMany({
-        userId: { $in: [...userIds, ...userIds.map((id) => new ObjectId(id))] },
-      });
+    await db.collection(name).deleteMany({
+      userId: { $in: [...userIds, ...userIds.map((id) => new ObjectId(id))] },
+    });
   await db.collection("rateLimit").deleteMany({});
   await mongo.close();
   await appClient().close();

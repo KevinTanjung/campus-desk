@@ -51,14 +51,11 @@ export function errorResponse(error: unknown) {
     );
   const unavailable =
     error instanceof MongoError ||
-    (error instanceof Error && /MONGODB_URI|BETTER_AUTH/.test(error.message));
+    (error instanceof Error &&
+      /MONGODB_URI|BETTER_AUTH|AUTH_IP_HEADER/.test(error.message));
   console.error(
     "Campus Desk request failed:",
-    process.env.NODE_ENV === "development" && error instanceof TypeError
-      ? error.stack
-      : error instanceof Error
-        ? error.name
-        : "UnknownError",
+    error instanceof Error ? error.name : "UnknownError",
   );
   return json(
     {
