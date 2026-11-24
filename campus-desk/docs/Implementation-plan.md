@@ -1,6 +1,6 @@
 # Campus Desk Implementation Plan
 
-Goal: implement the approved SRS using Next.js, TypeScript, MongoDB, Better Auth, Zod and CSS Modules.
+Goal: implement the approved SRS using Next.js, TypeScript, MongoDB, Better Auth, Zod and Tailwind CSS.
 
 Spec: docs/SRS.md. Next.js was approved on 27 November 2026. Existing unrelated UPH files must remain untouched. No README changes, new optional product features, external deployment, or account changes are needed to build and verify locally.
 
