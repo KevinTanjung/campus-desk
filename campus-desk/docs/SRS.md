@@ -17,10 +17,10 @@ The table of contents in the Word and PDF versions lists all numbered sections a
 This SRS defines the first release of Campus Desk, a website where students request campus services and staff track their completion. It defines the behavior, interfaces, data and acceptance criteria for the first release.
 
 ## 1.2 Document Conventions
-FR identifies a functional requirement; NFR identifies a quality requirement; UC identifies a use case; AT identifies an acceptance check. Every listed requirement is required for the first release unless marked as an open decision. “Shall” describes behavior that must be demonstrated. Student means a registered reporter. Staff means a campus service coordinator. A request means one campus service request.
+**FR** identifies a functional requirement; **NFR** identifies a quality requirement; **UC** identifies a use case; **AT** identifies an acceptance check. Every listed requirement is required for the first release unless marked as an open decision. “Shall” describes behavior that must be demonstrated. Student means a registered reporter. Staff means a campus service coordinator. A request means one campus service request.
 
 ## 1.3 Intended Audience and Reading Suggestions
-Product reviewers can read Section 1 and Appendices C-D to assess scope and coverage. Developers should read all sections, particularly the permission rules and API contract. Testers should use Section 4 and Appendices A and D. The interface design and database diagram are included with this document.
+Product reviewers can read Section 1, **Appendix C** and **Appendix D** to assess scope and coverage. Developers should read all sections, particularly the permission rules and API contract. Testers should use Section 4, **Appendix A** and **Appendix D**. The interface design and database diagram are included with this document.
 
 ## 1.4 Product Scope
 Campus Desk replaces an informal list of campus service requests with a small shared workflow. A student requests a transcript, a replacement student ID card, IT help or a facility repair, sees its status, and can correct or delete the report while it is still open. Staff see all reports, update progress, and maintain categories. Both roles receive a dashboard with relevant counts and recent requests.
@@ -30,7 +30,7 @@ Categories are created by staff rather than fixed in code. Example starting cate
 The first release includes registration, login, logout, two roles, request CRUD, category CRUD, sorting, filtering, a dashboard and a deployed release. It excludes payments, attachments, chat, email delivery, automatic assignment, maps, multiple campuses and public reporting. These features are outside the first release.
 
 ## 1.5 References
-Supporting project documents are the API contract in Section 3.2, database design in Appendix B, use cases in Appendix C, and acceptance criteria in Appendix D. These form part of this specification.
+Supporting project documents are the API contract in Section 3.2, database design in **Appendix B**, use cases in **Appendix C**, and acceptance criteria in **Appendix D**. These form part of this specification.
 
 # 2. Overall Description
 ## 2.1 Product Perspective
