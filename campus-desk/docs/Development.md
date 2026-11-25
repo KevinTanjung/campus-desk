@@ -28,7 +28,7 @@ Local development without a proxy intentionally shares an auth rate-limit bucket
 
 ## Vercel and Atlas deployment
 
-1. Create a MongoDB Atlas Free cluster and a database user restricted to the Campus Desk database. Choose the region nearest the Vercel function region. Configure Atlas network access for the deployment's egress; do not widen access without reviewing that change.
+1. Create a MongoDB Atlas Free cluster and a database user restricted to the Campus Desk database. Use Singapore to match the Vercel function region configured in `vercel.json`. Configure Atlas network access for the deployment's egress; do not widen access without reviewing that change.
 2. Put the project in a personal Git repository and import it into Vercel. Set the project root to `campus-desk` if the repository contains the UPH folder layout, or the repository root if Campus Desk is published separately. Use the Next.js preset and the build command `npm run build`.
 3. Add server-only environment variables: `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, and `BETTER_AUTH_URL`. Use the exact production HTTPS origin for `BETTER_AUTH_URL`. The Vercel runtime supplies `VERCEL=1`; no custom IP header setting is needed there. No variable needs a `NEXT_PUBLIC_` prefix.
 4. Run database initialization and staff provisioning from a trusted terminal with the production environment loaded, then deploy. Do not run those commands from the build hook or expose a setup endpoint.
