@@ -23,6 +23,8 @@ Deployed on 27 November 2026 at https://uph-akk-1912-campus-desk.vercel.app usin
 
 A focused HTTPS check passed 26 assertions covering registration, staff login, student role assignment, category permissions and updates, request validation, creation, editing, deletion, search and sorting, staff status changes, locked requests, dashboard access and logout. Session cookies have `Secure`, `HttpOnly` and `SameSite=Lax` attributes. The deployed staff dashboard loads in Chromium.
 
+The saved request and its resolved status survived a fresh Vercel deployment. A category update also succeeded after redeployment. The check's synthetic request, category, student account and related sessions were then removed; the staff account remains ready for use.
+
 ## Remaining release checks
 
-Persistence across a fresh deployment is being checked separately. Firefox, Safari, mobile Safari and a complete WCAG contrast/accessibility audit have not been run. No production load or cold-start performance result is claimed.
+Firefox, Safari, mobile Safari and a complete WCAG contrast/accessibility audit have not been run. No production load or cold-start performance result is claimed.
