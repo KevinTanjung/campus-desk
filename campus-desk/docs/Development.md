@@ -2,6 +2,8 @@
 
 Use Node.js 24 or 26 LTS, npm, and a MongoDB replica set. The dependency versions are pinned in package-lock.json. Production uses Vercel Hobby and MongoDB Atlas Free. Styling uses Tailwind CSS.
 
+Production URL: https://uph-akk-1912-campus-desk.vercel.app
+
 ## Local setup
 
 1. Run `npm ci` in the campus-desk directory.
@@ -34,7 +36,18 @@ Local development without a proxy intentionally shares an auth rate-limit bucket
 4. Run database initialization and staff provisioning from a trusted terminal with the production environment loaded, then deploy. Do not run those commands from the build hook or expose a setup endpoint.
 5. Verify registration, login, logout, both roles, request CRUD, category management, status transitions and persistence on the deployed HTTPS URL. Repeat a save after an app restart.
 
-Preview deployments need their own matching auth origin and a separate database if enabled. Do not point untrusted previews at production data. Keep the project within the providers' free-plan limits. This repository does not provision accounts or deploy automatically.
+The current deployment uses the personal Atlas organization `Kevin Tanjung Personal`, project `Campus Desk`, and free `campus-desk` cluster in Singapore. The application user is restricted to `readWrite` on `campus_desk` and that cluster. The approved network rule is `0.0.0.0/0` because Vercel Hobby uses changing outbound addresses; password authentication remains required. Vercel deploys pushes to `main`.
+
+Production credentials are stored in the Git-ignored `.env.production.local` file with local-user-only permissions. From the application directory, run:
+
+```sh
+node --env-file=.env.production.local --import tsx scripts/init-db.ts
+node --env-file=.env.production.local --import tsx scripts/seed-staff.ts
+```
+
+Use `STAFF_EMAIL` and `STAFF_PASSWORD` from that protected file for the staff login. Never commit the file or expose its values to the browser.
+
+Preview deployments need their own matching auth origin and a separate database if enabled. Do not point untrusted previews at production data. Keep the project within the providers' free-plan limits. Account creation and database provisioning are manual.
 
 ## Session expiry
 

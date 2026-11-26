@@ -17,6 +17,12 @@ The connected Chromium browser was used to register a synthetic student, log in/
 
 The review identified shared production auth throttling without trusted IP configuration, overly broad test-database access, failed-save navigation that discarded draft text, and misleading login errors. Production now uses Vercel's client IP header or requires an explicitly configured trusted proxy header. Tests are restricted to a separate local database and port. Expired-session writes retain the form, and auth errors distinguish throttling and unavailable service. Authentication bodies are read once through the bounded reader before being forwarded.
 
+## Production deployment
+
+Deployed on 27 November 2026 at https://uph-akk-1912-campus-desk.vercel.app using Vercel Hobby and a personal MongoDB Atlas Free cluster in Singapore. Database initialization and staff provisioning completed successfully. The application uses server-only production variables.
+
+A focused HTTPS check passed 26 assertions covering registration, staff login, student role assignment, category permissions and updates, request validation, creation, editing, deletion, search and sorting, staff status changes, locked requests, dashboard access and logout. Session cookies have `Secure`, `HttpOnly` and `SameSite=Lax` attributes. The deployed staff dashboard loads in Chromium.
+
 ## Remaining release checks
 
-Public deployment and account setup are pending. Repeat HTTPS cookie, trusted-proxy, Atlas network access, cold-start and persistence checks on the deployed URL. Firefox, Safari, mobile Safari and a complete WCAG contrast/accessibility audit have not been run. No production performance result is claimed.
+Persistence across a fresh deployment is being checked separately. Firefox, Safari, mobile Safari and a complete WCAG contrast/accessibility audit have not been run. No production load or cold-start performance result is claimed.
