@@ -1,6 +1,6 @@
 # Software Requirements Specification
 ## Campus Desk
-Version 1.0
+Version 1.1
 
 **Created:** 27 November 2026
 
@@ -8,6 +8,7 @@ Version 1.0
 | Version | Date | Change |
 | --- | --- | --- |
 | 1.0 | 27 November 2026 | Initial product requirements, use cases, API contract, database and interface design. |
+| 1.1 | 27 November 2026 | Expanded interface mockups for students, staff and mobile; added the Figma design link. |
 
 ## Table of Contents
 The table of contents in the Word and PDF versions lists all numbered sections and appendices with page numbers.
@@ -67,13 +68,53 @@ The team shall implement explicit REST endpoints so that server logic and fronte
 ## 3.1 User Interfaces
 The required routes are `/register`, `/login`, `/dashboard`, `/requests`, `/requests/new`, `/requests/[id]`, `/requests/[id]/edit` and `/categories.` The final route is staff-only. A role-aware navigation bar shall expose permitted pages and a working logout control. Direct navigation to a protected page shall require authentication and authorization.
 
-The main dashboard design is attached as dashboard-desktop.svg and dashboard-mobile.svg. These define the layout of the dashboard. The student dashboard shows total, open, in-progress and resolved counts, a New request button, and recent requests. Staff see the same counts for all reports, a review link and category management navigation. Each request row links to its details. Use text alongside color for every status.
+The interface design includes 13 mockups for authentication, student pages, staff pages and mobile layouts. The student dashboard shows counts and recent requests for the signed-in student. Staff see counts and requests across all students, request handling controls and category management. Each request row links to its details. Status labels use text alongside color.
 
-![Student dashboard (desktop)](design/dashboard-desktop.png)
+**Figma design:** [Campus Desk UI mockups](https://www.figma.com/design/rQ6UIsvVyf3ZrO5AecdvZU/Kevin-s-Figma-Project?node-id=0-1)
 
-![Student dashboard (mobile)](design/dashboard-mobile.png)
+The Figma file contains separate editable frames for the screens below. The embedded mockups show the same layouts with example request data. Student edit and delete actions apply only while a request is open. Staff-created categories determine which services students can request. The staff detail view shows an in-progress request with the resolution form; an open request shows Start work.
+
+| Figure | Screen and role | Purpose |
+| --- | --- | --- |
+| 1 | Login; Student and staff | Email and password login |
+| 2 | Create account; Student | Registration with name, email and password |
+| 3 | Student dashboard; Student | Own request counts and recent requests |
+| 4 | My requests; Student | Search, filter, sort and view own requests |
+| 5 | Student request detail; Student | Read details and access open-request actions |
+| 6 | New request; Student | Choose a category and submit a request |
+| 7 | Edit request; Student | Update an open request |
+| 8 | Staff dashboard; Staff | Counts and recent requests across students |
+| 9 | All requests; Staff | Search, filter, sort and review all requests |
+| 10 | Resolve request; Staff | Review a request and enter a resolution note |
+| 11 | Categories; Staff | Create, rename, activate, deactivate and delete categories |
+| 12 | Mobile student dashboard; Student | Stacked counts, recent requests and mobile navigation |
+| 13 | Mobile new request; Student | Single-column request form |
 
 Forms shall use visible labels, field-level errors and a clear submit state. A failed save shall retain entered values. Empty lists shall explain how to create or find a request. A failed load shall show a retry control. Deletion shall require a confirmation dialog. On narrow screens, request rows become cards; the page shall not require horizontal scrolling. Keyboard users shall be able to reach and use all controls with a visible focus indicator.
+
+![Figure 1. Login (student and staff)](design/screens/login.png)
+
+![Figure 2. Create account (student)](design/screens/register.png)
+
+![Figure 3. Student dashboard (student)](design/dashboard-desktop.png)
+
+![Figure 4. My requests (student)](design/screens/student-requests.png)
+
+![Figure 5. Student request detail (student)](design/screens/student-request-detail.png)
+
+![Figure 6. New request (student)](design/screens/student-new-request.png)
+
+![Figure 7. Edit request (student)](design/screens/student-edit-request.png)
+
+![Figure 8. Staff dashboard (staff)](design/screens/staff-dashboard.png)
+
+![Figure 9. All requests (staff)](design/screens/staff-requests.png)
+
+![Figure 10. Resolve request (staff)](design/screens/staff-request-detail.png)
+
+![Figure 11. Categories (staff)](design/screens/staff-categories.png)
+
+![Figures 12 and 13. Mobile student dashboard (left) and new request form (right)](design/screens/mobile-pair.png)
 
 ## 3.2 Software Interfaces
 All business endpoints use `/api.` Requests and responses use JSON, except successful deletions with no body. IDs are strings in JSON. Times use UTC ISO 8601 strings. Authentication uses a secure HTTP-only session cookie; JavaScript shall not store session tokens in `localStorage`. API clients send the cookie on same-origin requests.
