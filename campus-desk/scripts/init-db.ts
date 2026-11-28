@@ -1,4 +1,5 @@
 import { client, database, ensureIndexes } from "../lib/db";
+
 try {
   const hello = await database().admin().command({ hello: 1 });
   if (!hello.setName && hello.msg !== "isdbgrid")

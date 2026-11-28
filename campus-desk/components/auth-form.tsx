@@ -4,13 +4,17 @@ import { useState } from "react";
 import { authClient, authErrorMessage } from "@/lib/browser";
 import { registrationSchema, loginSchema } from "@/lib/validation";
 import { FieldError } from "./ui";
+
 export default function AuthForm({ register = false }: { register?: boolean }) {
-  const [busy, setBusy] = useState(false),
-    [error, setError] = useState(""),
-    [fields, setFields] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [fields, setFields] = useState<Record<string, string>>({});
+
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busy) {
+      return;
+    }
     setError("");
     setFields({});
     const values = Object.fromEntries(new FormData(event.currentTarget));
@@ -45,6 +49,7 @@ export default function AuthForm({ register = false }: { register?: boolean }) {
       setBusy(false);
     }
   }
+
   return (
     <div className="grid min-h-dvh grid-cols-2 max-[700px]:grid-cols-1">
       <aside className="flex flex-col justify-between bg-[#173e3b] px-[12%] py-[12vh] text-white [&_h1]:max-w-[460px] [&_h1]:text-[clamp(36px,4vw,58px)] [&_p]:max-w-[400px] [&_p]:text-[#d1e3db] max-[700px]:gap-6 max-[700px]:px-6 max-[700px]:py-[26px] max-[700px]:[&_h1]:mb-2.5 max-[700px]:[&_h1]:text-[30px] max-[700px]:[&_p]:m-0 max-[700px]:[&_small]:hidden">

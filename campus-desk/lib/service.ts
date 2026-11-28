@@ -18,11 +18,12 @@ import {
   listSchema,
 } from "./validation";
 import type { Actor, ServiceRequest, Category, Dashboard } from "./types";
+
 const idOf = (value: string) => new ObjectId(objectId.parse(value));
 const missing = () => new HttpError(404, "NOT_FOUND", "Request not found.");
 const conflict = (message: string) => new HttpError(409, "CONFLICT", message);
-const scope = (actor: Actor): Filter<RequestDoc> =>
-  actor.role === "staff" ? {} : { reporterId: actor.id };
+const scope = (actor: Actor): Filter<RequestDoc> => actor.role === "staff" ? {} : { reporterId: actor.id };
+
 function categoryView(row: CategoryDoc): Category {
   return {
     id: row._id.toHexString(),
@@ -32,6 +33,7 @@ function categoryView(row: CategoryDoc): Category {
     updatedAt: row.updatedAt.toISOString(),
   };
 }
+
 async function requestViews(
   rows: RequestDoc[],
   actor: Actor,
@@ -87,36 +89,47 @@ async function requestViews(
       : {}),
   }));
 }
+
 async function useCategory(id: ObjectId, session: ClientSession) {
   const result = await categories().updateOne(
     { _id: id, active: true },
     { $inc: { referenceVersion: 1 } },
     { session },
   );
-  if (!result.matchedCount)
+  if (!result.matchedCount) {
     throw new HttpError(400, "VALIDATION_ERROR", "Choose an active category.");
+  }
 }
+
 export async function getRequest(actor: Actor, id: string) {
   const row = await requests().findOne({ ...scope(actor), _id: idOf(id) });
   if (!row) throw missing();
   return (await requestViews([row], actor, true))[0];
 }
+
 export async function listRequests(actor: Actor, input: unknown) {
   const query = listSchema.parse(input);
   const filter: Filter<RequestDoc> = { ...scope(actor) };
-  if (query.status) filter.status = query.status;
-  if (query.categoryId) filter.categoryId = idOf(query.categoryId);
-  if (query.q)
+  if (query.status) {
+    filter.status = query.status;
+  }
+  if (query.categoryId) {
+    filter.categoryId = idOf(query.categoryId);
+  }
+  if (query.q) {
     filter.title = {
       $regex: query.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
       $options: "i",
     };
+  }
+
   const orders: Record<typeof query.sort, Sort> = {
     newest: { createdAt: -1, _id: -1 },
     oldest: { createdAt: 1, _id: 1 },
     title_asc: { title: 1, _id: 1 },
     title_desc: { title: -1, _id: -1 },
   };
+
   const [rows, total] = await Promise.all([
     requests()
       .find(filter)
@@ -126,6 +139,7 @@ export async function listRequests(actor: Actor, input: unknown) {
       .toArray(),
     requests().countDocuments(filter),
   ]);
+
   return {
     data: await requestViews(rows, actor),
     total,
@@ -133,10 +147,11 @@ export async function listRequests(actor: Actor, input: unknown) {
     pageSize: query.pageSize,
   };
 }
+
 export async function createRequest(actor: Actor, input: unknown) {
   requireRole(actor, "student");
-  const data = requestSchema.parse(input),
-    now = new Date();
+  const data = requestSchema.parse(input);
+  const now = new Date();
   const row: RequestDoc = {
     ...data,
     _id: new ObjectId(),
@@ -156,35 +171,43 @@ export async function createRequest(actor: Actor, input: unknown) {
   );
   return getRequest(actor, row._id.toHexString());
 }
+
 export async function editRequest(actor: Actor, id: string, input: unknown) {
   requireRole(actor, "student");
-  const data = requestPatchSchema.parse(input),
-    _id = idOf(id);
+  const data = requestPatchSchema.parse(input);
+  const _id = idOf(id);
+
   await client().withSession((session) =>
     session.withTransaction(async () => {
       const row = await requests().findOne(
         { _id, reporterId: actor.id },
         { session },
       );
-      if (!row) throw missing();
-      if (row.status !== "open")
+      if (!row) {
+        throw missing();
+      }
+      if (row.status !== "open") {
         throw conflict("Only open requests can be edited.");
+      }
       const categoryId = data.categoryId
         ? idOf(data.categoryId)
         : row.categoryId;
-      if (!categoryId.equals(row.categoryId))
+      if (!categoryId.equals(row.categoryId)) {
         await useCategory(categoryId, session);
+      }
       const changed = await requests().updateOne(
         { _id, reporterId: actor.id, status: "open" },
         { $set: { ...data, categoryId, updatedAt: new Date() } },
         { session },
       );
-      if (!changed.matchedCount)
+      if (!changed.matchedCount) {
         throw conflict("The request changed. Refresh and try again.");
+      }
     }),
   );
   return getRequest(actor, id);
 }
+
 export async function deleteRequest(actor: Actor, id: string) {
   requireRole(actor, "student");
   const _id = idOf(id);
@@ -194,11 +217,13 @@ export async function deleteRequest(actor: Actor, id: string) {
     status: "open",
   });
   if (!changed.deletedCount) {
-    if (!(await requests().findOne({ _id, reporterId: actor.id })))
+    if (!(await requests().findOne({ _id, reporterId: actor.id }))) {
       throw missing();
+    }
     throw conflict("Only open requests can be deleted.");
   }
 }
+
 export async function updateStatus(actor: Actor, id: string, input: unknown) {
   requireRole(actor, "staff");
   const data = statusSchema.parse(input),
@@ -216,13 +241,16 @@ export async function updateStatus(actor: Actor, id: string, input: unknown) {
     },
   );
   if (!result.matchedCount) {
-    if (!(await requests().findOne({ _id }))) throw missing();
+    if (!(await requests().findOne({ _id }))) {
+      throw missing();
+    }
     throw conflict(
       "The request status changed or this transition is not allowed. Refresh and try again.",
     );
   }
   return getRequest(actor, id);
 }
+
 export async function listCategories(actor: Actor) {
   return (
     await categories()
@@ -231,10 +259,11 @@ export async function listCategories(actor: Actor) {
       .toArray()
   ).map(categoryView);
 }
+
 export async function createCategory(actor: Actor, input: unknown) {
   requireRole(actor, "staff");
-  const data = categorySchema.parse(input),
-    now = new Date();
+  const data = categorySchema.parse(input);
+  const now = new Date();
   const row = {
     ...data,
     _id: new ObjectId(),
@@ -247,6 +276,7 @@ export async function createCategory(actor: Actor, input: unknown) {
   await categories().insertOne(row);
   return categoryView(row);
 }
+
 export async function editCategory(actor: Actor, id: string, input: unknown) {
   requireRole(actor, "staff");
   const data = categoryPatchSchema.parse(input);
@@ -262,9 +292,12 @@ export async function editCategory(actor: Actor, id: string, input: unknown) {
     },
     { returnDocument: "after" },
   );
-  if (!row) throw new HttpError(404, "NOT_FOUND", "Category not found.");
+  if (!row) {
+    throw new HttpError(404, "NOT_FOUND", "Category not found.");
+  }
   return categoryView(row);
 }
+
 export async function deleteCategory(actor: Actor, id: string) {
   requireRole(actor, "staff");
   const _id = idOf(id);
@@ -275,8 +308,9 @@ export async function deleteCategory(actor: Actor, id: string) {
         { $inc: { referenceVersion: 1 } },
         { session },
       );
-      if (!result.matchedCount)
+      if (!result.matchedCount) {
         throw new HttpError(404, "NOT_FOUND", "Category not found.");
+      }
       if (
         await requests().countDocuments(
           { categoryId: _id },
@@ -288,6 +322,7 @@ export async function deleteCategory(actor: Actor, id: string) {
     }),
   );
 }
+
 export async function dashboard(actor: Actor): Promise<Dashboard> {
   const [result] = await requests()
     .aggregate<{
@@ -303,11 +338,10 @@ export async function dashboard(actor: Actor): Promise<Dashboard> {
       },
     ])
     .toArray();
-  const count = (status: string) =>
-    result.counts.find((item) => item._id === status)?.count || 0;
-  const open = count("open"),
-    inProgress = count("in_progress"),
-    resolved = count("resolved");
+  const count = (status: string) => result.counts.find((item) => item._id === status)?.count || 0;
+  const open = count("open");
+  const inProgress = count("in_progress");
+  const resolved = count("resolved");
   return {
     counts: { total: open + inProgress + resolved, open, inProgress, resolved },
     recentRequests: await requestViews(result.recent, actor),

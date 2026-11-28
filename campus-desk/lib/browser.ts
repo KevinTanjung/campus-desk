@@ -1,7 +1,10 @@
 "use client";
+
 import { useCallback, useEffect, useState } from "react";
 import { createAuthClient } from "better-auth/react";
+
 export const authClient = createAuthClient();
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -11,6 +14,7 @@ export class ApiError extends Error {
     super(message);
   }
 }
+
 export async function api<T>(
   url: string,
   method = "GET",
@@ -29,11 +33,15 @@ export async function api<T>(
           body: JSON.stringify(body),
         }),
   });
-  if (response.status === 204) return undefined as T;
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   const data = await response.json();
   if (!response.ok) {
-    if (response.status === 401 && method === "GET")
+    if (response.status === 401 && method === "GET") {
       window.location.assign("/login");
+    }
     throw new ApiError(
       response.status === 401
         ? "Your session has expired. Log in in another tab, then retry. Your changes are still here."
@@ -44,6 +52,7 @@ export async function api<T>(
   }
   return data;
 }
+
 export function useResource<T>(url: string) {
   const [state, setState] = useState<{
     data?: T;
@@ -62,13 +71,17 @@ export function useResource<T>(url: string) {
       });
     return () => controller.abort();
   }, [url, version]);
+
   return { ...state, reload };
 }
 
 export function authErrorMessage(status: number, register: boolean) {
-  if (status === 429)
+  if (status === 429) {
     return "Too many attempts. Please wait a minute and try again.";
-  if (status >= 500) return "The service is unavailable. Please try again.";
+  }
+  if (status >= 500) {
+    return "The service is unavailable. Please try again.";
+  }
   return register
     ? "Could not create your account. Check your details or log in if you already have an account."
     : "Email or password is incorrect. Please try again.";

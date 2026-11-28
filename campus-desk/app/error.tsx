@@ -1,4 +1,5 @@
 "use client";
+
 export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
     <main style={{ maxWidth: 600, margin: "15vh auto", padding: 24 }}>

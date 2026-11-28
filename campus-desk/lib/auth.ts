@@ -3,18 +3,21 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { client, database, ensureIndexes } from "./db";
 import { registrationSchema, loginSchema } from "./validation";
+
 function createAuth() {
   const secret = process.env.BETTER_AUTH_SECRET;
-  if (!secret || secret.length < 32 || secret.startsWith("replace-"))
-    throw new Error(
-      "Set a random BETTER_AUTH_SECRET of at least 32 characters.",
-    );
+  if (!secret || secret.length < 32 || secret.startsWith("replace-")) {
+    throw new Error("Set a random BETTER_AUTH_SECRET of at least 32 characters.");
+  }
   const baseURL = process.env.BETTER_AUTH_URL;
-  if (!baseURL) throw new Error("BETTER_AUTH_URL is required.");
-  const ipHeader =
-    process.env.VERCEL === "1" ? "x-forwarded-for" : process.env.AUTH_IP_HEADER;
-  if (process.env.NODE_ENV === "production" && !ipHeader)
+  if (!baseURL) {
+    throw new Error("BETTER_AUTH_URL is required.");
+  }
+  const ipHeader = process.env.VERCEL === "1" ? "x-forwarded-for" : process.env.AUTH_IP_HEADER;
+  if (process.env.NODE_ENV === "production" && !ipHeader) {
     throw new Error("AUTH_IP_HEADER is required outside Vercel in production.");
+  }
+
   return betterAuth({
     appName: "Campus Desk",
     baseURL,
@@ -82,7 +85,9 @@ function createAuth() {
     },
   });
 }
+
 let instance: ReturnType<typeof createAuth> | undefined;
+
 export async function getAuth() {
   await ensureIndexes();
   return (instance ??= createAuth());

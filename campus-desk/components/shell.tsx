@@ -1,15 +1,21 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useState } from "react";
 import type { Actor } from "@/lib/types";
 import { authClient } from "@/lib/browser";
+
 const ActorContext = createContext<Actor | null>(null);
+
 export function useActor() {
   const actor = useContext(ActorContext);
-  if (!actor) throw new Error("Missing account.");
+  if (!actor) {
+    throw new Error("Missing account.");
+  }
   return actor;
 }
+
 export default function Shell({
   actor,
   children,
@@ -26,7 +32,9 @@ export default function Shell({
     setError("");
     try {
       const result = await authClient.signOut();
-      if (result.error) throw new Error("Logout failed. Please try again.");
+      if (result.error) {
+        throw new Error("Logout failed. Please try again.");
+      }
       window.location.assign("/login");
     } catch {
       setError("Logout failed. Please try again.");

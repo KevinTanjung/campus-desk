@@ -1,13 +1,16 @@
 "use client";
+
 import Link from "next/link";
 import { useActor } from "@/components/shell";
 import { Heading, LoadState, RequestTable } from "@/components/ui";
 import { useResource } from "@/lib/browser";
 import type { Dashboard } from "@/lib/types";
+
 export default function DashboardPage() {
-  const actor = useActor(),
-    state = useResource<{ data: Dashboard }>("/api/dashboard");
+  const actor = useActor();
+  const state = useResource<{ data: Dashboard }>("/api/dashboard");
   const data = state.data?.data;
+
   return (
     <>
       <Heading

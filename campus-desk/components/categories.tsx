@@ -1,17 +1,20 @@
 "use client";
+
 import { SaveError } from "./ui";
 import { useState } from "react";
 import { categorySchema } from "@/lib/validation";
 import { api, useResource } from "@/lib/browser";
 import type { Category } from "@/lib/types";
 import { Heading, LoadState, ConfirmDialog } from "./ui";
+
 export default function Categories() {
-  const state = useResource<{ data: Category[] }>("/api/categories"),
-    [editing, setEditing] = useState<Category | null>(null),
-    [deleting, setDeleting] = useState<Category | null>(null),
-    [busy, setBusy] = useState(false),
-    [error, setError] = useState(""),
-    [success, setSuccess] = useState("");
+  const state = useResource<{ data: Category[] }>("/api/categories");
+  const [editing, setEditing] = useState<Category | null>(null);
+  const [deleting, setDeleting] = useState<Category | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
@@ -42,6 +45,7 @@ export default function Categories() {
       setBusy(false);
     }
   }
+
   async function change(row: Category, remove = false) {
     if (busy) return;
     setBusy(true);
@@ -63,6 +67,7 @@ export default function Categories() {
       setBusy(false);
     }
   }
+
   return (
     <>
       <Heading

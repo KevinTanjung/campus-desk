@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 export default function NotFound() {
   return (
     <main style={{ maxWidth: 600, margin: "15vh auto", padding: 24 }}>

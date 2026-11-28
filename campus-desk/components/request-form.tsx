@@ -1,4 +1,5 @@
 "use client";
+
 import { SaveError } from "./ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,24 +8,31 @@ import { api, ApiError, useResource } from "@/lib/browser";
 import type { Category, ServiceRequest } from "@/lib/types";
 import { requestSchema } from "@/lib/validation";
 import { FieldError, LoadState } from "./ui";
+
 export default function RequestForm({
   existing,
 }: {
   existing?: ServiceRequest;
 }) {
-  const router = useRouter(),
-    categories = useResource<{ data: Category[] }>("/api/categories");
-  const [busy, setBusy] = useState(false),
-    [error, setError] = useState(""),
-    [fields, setFields] = useState<Record<string, string>>({});
+  const router = useRouter();
+  const categories = useResource<{ data: Category[] }>("/api/categories");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [fields, setFields] = useState<Record<string, string>>({});
+
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busy) {
+      return;
+    }
+
     setFields({});
     setError("");
+
     const parsed = requestSchema.safeParse(
       Object.fromEntries(new FormData(event.currentTarget)),
     );
+
     if (!parsed.success) {
       setFields(
         Object.fromEntries(
@@ -36,7 +44,9 @@ export default function RequestForm({
       );
       return;
     }
+
     setBusy(true);
+
     try {
       const result = await api<{ data: ServiceRequest }>(
         existing ? `/api/requests/${existing.id}` : "/api/requests",
@@ -46,10 +56,10 @@ export default function RequestForm({
       router.push(`/requests/${result.data.id}`);
       router.refresh();
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Could not save. Please try again.",
-      );
-      if (e instanceof ApiError) setFields(e.fields);
+      setError(e instanceof Error ? e.message : "Could not save. Please try again.");
+      if (e instanceof ApiError) {
+        setFields(e.fields);
+      }
       setBusy(false);
     }
   }

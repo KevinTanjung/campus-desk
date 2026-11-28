@@ -6,14 +6,17 @@ import {
   json,
   readJson,
 } from "@/lib/http";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
 const paths = new Set([
   "sign-up/email",
   "sign-in/email",
   "sign-out",
   "get-session",
 ]);
+
 async function handle(request: Request) {
   try {
     const path = new URL(request.url).pathname.replace("/api/auth/", "");
@@ -56,5 +59,7 @@ async function handle(request: Request) {
     return errorResponse(error);
   }
 }
+
 export const GET = handle;
+
 export const POST = handle;

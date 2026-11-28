@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { MongoNetworkError } from "mongodb";
 import { readJson, errorResponse, HttpError, checkOrigin } from "../lib/http";
+
 test("bounded streaming JSON rejects oversized bodies without waiting for a stream to close", async () => {
   const body = new ReadableStream({
     start(controller) {
@@ -28,6 +29,7 @@ test("bounded streaming JSON rejects oversized bodies without waiting for a stre
     (error) => error instanceof HttpError && error.status === 413,
   );
 });
+
 test("invalid JSON and foreign origins fail, and database outages return a safe retry response", async () => {
   await assert.rejects(
     readJson(

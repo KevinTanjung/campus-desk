@@ -1,4 +1,5 @@
 "use client";
+
 import { SaveError } from "./ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,19 +14,26 @@ import {
   ConfirmDialog,
   FieldError,
 } from "./ui";
+
 export default function RequestDetail({ id }: { id: string }) {
-  const actor = useActor(),
-    router = useRouter(),
-    state = useResource<{ data: ServiceRequest }>(`/api/requests/${id}`),
-    row = state.data?.data;
-  const [confirm, setConfirm] = useState(false),
-    [busy, setBusy] = useState(false),
-    [error, setError] = useState(""),
-    [fields, setFields] = useState<Record<string, string>>({});
+  const actor = useActor();
+  const router = useRouter();
+  const state = useResource<{ data: ServiceRequest }>(`/api/requests/${id}`);
+  const row = state.data?.data;
+
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [fields, setFields] = useState<Record<string, string>>({});
+
   async function remove() {
-    if (busy) return;
+    if (busy) {
+      return;
+    }
+
     setBusy(true);
     setError("");
+
     try {
       await api(`/api/requests/${id}`, "DELETE");
       router.push("/requests");
@@ -33,18 +41,22 @@ export default function RequestDetail({ id }: { id: string }) {
     } catch (e) {
       setConfirm(false);
       setBusy(false);
-      setError(
-        e instanceof Error ? e.message : "Could not delete. Please try again.",
-      );
+      setError(e instanceof Error ? e.message : "Could not delete. Please try again.");
     }
   }
+
   async function progress(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy || !row) return;
+    if (busy || !row) {
+      return;
+    }
+
     setBusy(true);
     setFields({});
     setError("");
+
     const values = new FormData(event.currentTarget);
+
     try {
       await api(`/api/requests/${id}/status`, "PATCH", {
         status: row.status === "open" ? "in_progress" : "resolved",
@@ -52,10 +64,10 @@ export default function RequestDetail({ id }: { id: string }) {
       });
       state.reload();
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Could not update. Please try again.",
-      );
-      if (e instanceof ApiError) setFields(e.fields);
+      setError(e instanceof Error ? e.message : "Could not update. Please try again.");
+      if (e instanceof ApiError) {
+        setFields(e.fields);
+      }
     } finally {
       setBusy(false);
     }

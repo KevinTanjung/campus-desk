@@ -3,6 +3,7 @@ import { MongoError } from "mongodb";
 import { getAuth } from "./auth";
 import { database } from "./db";
 import type { Actor, Role } from "./types";
+
 export class HttpError extends Error {
   constructor(
     public status: number,
@@ -12,22 +13,23 @@ export class HttpError extends Error {
     super(message);
   }
 }
+
 export function json(data: unknown, status = 200) {
   return Response.json(data, {
     status,
     headers: { "Cache-Control": "private, no-store" },
   });
 }
+
 export function errorResponse(error: unknown) {
-  if (error instanceof HttpError)
+  if (error instanceof HttpError) {
     return json(
       { error: { code: error.code, message: error.message } },
       error.status,
     );
+  }
   if (error instanceof ZodError) {
-    const fields = Object.fromEntries(
-      error.issues.map((issue) => [issue.path.join("."), issue.message]),
-    );
+    const fields = Object.fromEntries(error.issues.map((issue) => [issue.path.join("."), issue.message]),);
     return json(
       {
         error: {
@@ -39,7 +41,7 @@ export function errorResponse(error: unknown) {
       400,
     );
   }
-  if (error instanceof MongoError && "code" in error && error.code === 11000)
+  if (error instanceof MongoError && "code" in error && error.code === 11000) {
     return json(
       {
         error: {
@@ -49,14 +51,10 @@ export function errorResponse(error: unknown) {
       },
       409,
     );
-  const unavailable =
-    error instanceof MongoError ||
-    (error instanceof Error &&
-      /MONGODB_URI|BETTER_AUTH|AUTH_IP_HEADER/.test(error.message));
-  console.error(
-    "Campus Desk request failed:",
-    error instanceof Error ? error.name : "UnknownError",
-  );
+  }
+  const unavailable = error instanceof MongoError || (error instanceof Error && /MONGODB_URI|BETTER_AUTH|AUTH_IP_HEADER/.test(error.message));
+  console.error("Campus Desk request failed:", error instanceof Error ? error.name : "UnknownError");
+
   return json(
     {
       error: {
@@ -69,6 +67,7 @@ export function errorResponse(error: unknown) {
     unavailable ? 503 : 500,
   );
 }
+
 export function checkOrigin(request: Request) {
   if (
     request.headers.get("origin") !==
@@ -80,21 +79,23 @@ export function checkOrigin(request: Request) {
       "This request did not come from Campus Desk.",
     );
 }
+
 export async function readJson(request: Request): Promise<unknown> {
-  if (
-    !request.headers
-      .get("content-type")
-      ?.toLowerCase()
-      .startsWith("application/json")
-  )
+  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
     throw new HttpError(400, "INVALID_JSON", "Send a JSON request.");
+  }
+
   const reader = request.body?.getReader();
-  if (!reader) throw new HttpError(400, "INVALID_JSON", "Send a JSON request.");
+  if (!reader) {
+    throw new HttpError(400, "INVALID_JSON", "Send a JSON request.");
+  }
   const chunks: Uint8Array[] = [];
   let bytes = 0;
   while (true) {
     const { value, done } = await reader.read();
-    if (done) break;
+    if (done) {
+      break;
+    }
     bytes += value.length;
     if (bytes > 16 * 1024) {
       await reader.cancel();
@@ -108,27 +109,33 @@ export async function readJson(request: Request): Promise<unknown> {
     throw new HttpError(400, "INVALID_JSON", "Send valid JSON.");
   }
 }
+
 export async function currentActor(headers: Headers): Promise<Actor | null> {
   const auth = await getAuth();
   const session = await auth.api.getSession({ headers });
-  if (!session) return null;
-  const user = await database()
-    .collection("user")
-    .findOne(
-      { $expr: { $eq: [{ $toString: "$_id" }, session.user.id] } },
-      { projection: { name: 1, role: 1 } },
-    );
-  if (!user || (user.role !== "staff" && user.role !== "student")) return null;
+  if (!session) {
+    return null;
+  }
+  const user = await database().collection("user").findOne(
+    { $expr: { $eq: [{ $toString: "$_id" }, session.user.id] } },
+    { projection: { name: 1, role: 1 } },
+  );
+  if (!user || (user.role !== "staff" && user.role !== "student")) {
+    return null;
+  }
   return { id: session.user.id, name: user.name, role: user.role };
 }
+
 export function requireRole(actor: Actor, role: Role) {
-  if (actor.role !== role)
+  if (actor.role !== role) {
     throw new HttpError(
       403,
       "FORBIDDEN",
       "Your account cannot perform this action.",
     );
+  }
 }
+
 export function endpoint(
   handler: (request: Request, actor: Actor, id?: string) => Promise<Response>,
 ) {
@@ -137,14 +144,17 @@ export function endpoint(
     context?: { params: Promise<{ id?: string }> },
   ) => {
     try {
-      if (!["GET", "HEAD"].includes(request.method)) checkOrigin(request);
+      if (!["GET", "HEAD"].includes(request.method)) {
+        checkOrigin(request);
+      }
       const actor = await currentActor(request.headers);
-      if (!actor)
+      if (!actor) {
         throw new HttpError(
           401,
           "UNAUTHENTICATED",
           "Please log in to continue.",
         );
+      }
       return await handler(
         request,
         actor,

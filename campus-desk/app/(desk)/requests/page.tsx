@@ -5,14 +5,16 @@ import { useActor } from "@/components/shell";
 import { Heading, LoadState, RequestTable } from "@/components/ui";
 import { useResource } from "@/lib/browser";
 import type { Category, RequestPage } from "@/lib/types";
+
 export default function RequestsPage() {
   const actor = useActor();
-  const [filter, setFilter] = useState(""),
-    [page, setPage] = useState(1);
+  const [filter, setFilter] = useState("");
+  const [page, setPage] = useState(1);
   const state = useResource<RequestPage>(
-      `/api/requests?${filter}${filter ? "&" : ""}page=${page}`,
-    ),
-    categories = useResource<{ data: Category[] }>("/api/categories");
+    `/api/requests?${filter}${filter ? "&" : ""}page=${page}`,
+  );
+  const categories = useResource<{ data: Category[] }>("/api/categories");
+
   function apply(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new FormData(event.currentTarget),
@@ -23,7 +25,9 @@ export default function RequestsPage() {
     setPage(1);
     setFilter(params.toString());
   }
+
   const data = state.data;
+
   return (
     <>
       <Heading

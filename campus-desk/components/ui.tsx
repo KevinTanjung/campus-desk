@@ -1,7 +1,9 @@
 "use client";
+
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { statusLabels, type Status, type ServiceRequest } from "@/lib/types";
+
 export function StatusBadge({ status }: { status: Status }) {
   return (
     <span
@@ -11,6 +13,7 @@ export function StatusBadge({ status }: { status: Status }) {
     </span>
   );
 }
+
 export function Heading({
   title,
   description,
@@ -36,6 +39,7 @@ export function Heading({
     </>
   );
 }
+
 export function LoadState({
   loading,
   error,
@@ -63,6 +67,7 @@ export function LoadState({
     );
   return null;
 }
+
 export function RequestTable({
   rows,
   staff,
@@ -106,6 +111,7 @@ export function RequestTable({
     </table>
   );
 }
+
 export function FieldError({
   name,
   fields,
@@ -122,6 +128,7 @@ export function FieldError({
     </span>
   ) : null;
 }
+
 export function ConfirmDialog({
   title,
   children,

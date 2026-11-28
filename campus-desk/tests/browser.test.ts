@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { api, ApiError, authErrorMessage } from "../lib/browser";
+
 test("a failed save with an expired session keeps the current page", async () => {
   const originalFetch = globalThis.fetch;
   let navigated = false;
@@ -26,6 +27,7 @@ test("a failed save with an expired session keeps the current page", async () =>
     Reflect.deleteProperty(globalThis, "window");
   }
 });
+
 test("authentication failures distinguish throttling and service outages", () => {
   assert.match(authErrorMessage(429, false), /Too many/);
   assert.match(authErrorMessage(503, false), /unavailable/);

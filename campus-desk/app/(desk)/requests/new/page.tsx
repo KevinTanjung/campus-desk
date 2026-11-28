@@ -1,6 +1,7 @@
 import RequestForm from "@/components/request-form";
 import { Heading } from "@/components/ui";
 import { pageActor } from "@/lib/page-auth";
+
 export default async function NewRequest() {
   await pageActor("student");
   return (
